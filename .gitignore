@@ -5,3 +5,4 @@ __pycache__/
 .chroma/
 chroma_db/
 uploaded_files/
+app_data.db

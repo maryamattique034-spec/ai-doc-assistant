@@ -108,3 +108,6 @@ zstandard==0.25.0
 fastapi==0.141.1
 python-multipart==0.0.32
 streamlit==1.63.0
+python-jose==3.5.0
+email-validator==2.3.0
+SQLAlchemy==2.0.52
