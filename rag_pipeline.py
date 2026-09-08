@@ -54,16 +54,22 @@ def ingest_pdf(pdf_path):
     return len(chunks)
 
 
-# 5. Question Query Function
-def ask_pdf(question, n_results=3):
+# 5. Question Query Function (optionally limit to one PDF via source filename)
+def ask_pdf(question, n_results=3, source=None):
     query_embedding = get_embedding(question)
 
-    results = collection.query(
-        query_embeddings=[query_embedding],
-        n_results=n_results,
-    )
+    query_kwargs = {
+        "query_embeddings": [query_embedding],
+        "n_results": n_results,
+    }
+    if source:
+        query_kwargs["where"] = {"source": source}
+
+    results = collection.query(**query_kwargs)
 
     if not results["documents"] or not results["documents"][0]:
+        if source:
+            return f"No relevant context found in '{source}'. Index that PDF first."
         return "No relevant context found in indexed PDFs."
 
     context = "\n\n".join(results["documents"][0])
@@ -87,6 +93,10 @@ Question: {question}
 
 if __name__ == "__main__":
     # Re-run ingest only when you change the PDF; data stays in ./chroma_db
-    ingest_pdf("sample_data/samplextra2.pdf")
-    answer = ask_pdf("What is the somatosensory system?")
+    pdf = "sample_data/samplextra2.pdf"
+    ingest_pdf(pdf)
+    answer = ask_pdf(
+        "What is the somatosensory system?",
+        source=os.path.basename(pdf),
+    )
     print(answer)
